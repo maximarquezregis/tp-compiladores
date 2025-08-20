@@ -47,4 +47,7 @@ AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n){
 
 AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right ){
 }
+
+AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v){
+}
 #endif //AST_H

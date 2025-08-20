@@ -18,3 +18,11 @@ AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n){
   node->left = n;
   return node;
 }
+
+AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v){
+  AST_LEAF* node = (AST_LEAF*) malloc(sizeof(AST_LEAF));
+  node->father = NULL;
+  node->type = type;
+  node->value = v;
+  return node;
+}
