@@ -37,3 +37,18 @@ AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v){
 
   return node;
 }
+
+void* cast(LEAF_TYPE t){
+  switch (t)
+  {
+  case INT:
+    return malloc(sizeof(int));
+    break;
+
+  case ID:
+    return malloc(sizeof(char*));
+
+    default:
+    break;
+  }
+}
