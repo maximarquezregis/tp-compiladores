@@ -42,7 +42,9 @@ typedef struct AST_LEAF {
     void *value;
 } AST_LEAF;
 
-AST_NODE* new_unary_node(OPERATOR opt, AST_NODE*){
+AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n){
 }
 
+AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right ){
+}
 #endif //AST_H
