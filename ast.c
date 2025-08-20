@@ -23,6 +23,17 @@ AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v){
   AST_LEAF* node = (AST_LEAF*) malloc(sizeof(AST_LEAF));
   node->father = NULL;
   node->type = type;
-  node->value = v;
+  node->value = cast(type);
+
+  switch (type){
+    case INT:
+      memcpy(node->value, v, sizeof(int));
+      break;
+
+    case ID:
+      *(char**)node->value = strdup((char*)v);
+      break;
+  }
+
   return node;
 }
