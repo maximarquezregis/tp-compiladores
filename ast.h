@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <stdlib.h>
+#include <string.h>
 
 #define true 1
 #define false 0
@@ -12,22 +13,22 @@ typedef enum {
 } OPERATOR_ARITY;
 
 typedef enum {
-    ADDITION,
-    SUBTRACTION,
-    MULTIPLICATION,
-    DIVISION,
-    MINUS,
-    AND,
-    OR,
-    NEG,
-    ASSIGN,
-    RETURN
+    OP_ADDITION,
+    OP_SUBTRACTION,
+    OP_MULTIPLICATION,
+    OP_DIVISION,
+    OP_MINUS,
+    OP_AND,
+    OP_OR,
+    OP_NEG,
+    OP_ASSIGN,
+    OP_RETURN
 } OPERATOR;
 
 typedef enum {
-    INT,
-    BOOL,
-    ID
+    TYPE_INT,
+    TYPE_BOOL,
+    TYPE_ID
 } LEAF_TYPE;
 
 typedef struct AST_NODE {
@@ -45,12 +46,8 @@ typedef struct AST_LEAF {
     void *value;
 } AST_LEAF;
 
-AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n){
-}
+AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n);
+AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right);
+AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v);
 
-AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right ){
-}
-
-AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v){
-}
 #endif //AST_H
