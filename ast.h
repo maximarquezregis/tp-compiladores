@@ -22,7 +22,9 @@ typedef enum {
     OP_OR,
     OP_NEG,
     OP_ASSIGN,
-    OP_RETURN
+    OP_RETURN,
+    OP_DECL_INT,
+	OP_DECL_BOOL
 } OPERATOR;
 
 typedef enum {
@@ -30,6 +32,15 @@ typedef enum {
     TYPE_BOOL,
     TYPE_ID
 } LEAF_TYPE;
+
+typedef struct AST_ROOT {
+    AST_ROOT *next;
+    AST_NODE *sentence;
+    int amount;
+    // flag used for checking if the program should return an integer or void
+    // assuming there's no other types main can return
+    int returnInt? = true;
+}
 
 typedef struct AST_NODE {
     struct AST_NODE *father;
@@ -46,8 +57,8 @@ typedef struct AST_LEAF {
     void *value;
 } AST_LEAF;
 
-AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* n);
-AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right);
-AST_LEAF* new_leaf_node(LEAF_TYPE type, void* v);
+AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left);
+AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right);
+AST_LEAF* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
 
 #endif //AST_H
