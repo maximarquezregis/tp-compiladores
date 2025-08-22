@@ -1,6 +1,7 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast.h"
 #include "ej3-sint.tab.h"
 int yyparse(void);
 %}
@@ -13,23 +14,18 @@ digito [0-9]+
 
 %%
 
-{digito}+               { return INT_VAL; }
-"true"                  { return BOOL_VAL; }
-"false"                 { return BOOL_VAL; }
-"if"                    { return IF; }
-"int"                   { return INT; }
-"while"                 { return WHILE; }
-"else"                  { return ELSE; }
-"do"                    { return DO; }
+{digito}+               { yylval.ival = atoi(yytext); return INT_VAL; }
+"true"                  { yylval.ival = 1; return BOOL_VAL; }
+"false"                 { yylval.ival = 0; return BOOL_VAL; }
 "return"                { return RETURN; }
 "bool"                  { return BOOL; }
 "main"                  { return MAIN; }
+{letra}({letra}|[0-9])* { yylval.sval = strdup(yytext); return ID; }
 "&&"                    { return AND; }
 "||"                    { return OR; }
 "!"                     { return NEG; }
-[+*/%=]                 { return *yytext; }
+[+\-*/%=]               { return *yytext; }
 [;(){}]                 { return *yytext; }
-{letra}({letra}|[0-9])* { return ID; }
 [ \t\r\n]+              { }
 .                       { }
 

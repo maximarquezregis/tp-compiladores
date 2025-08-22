@@ -1,13 +1,23 @@
 %{
 #include <stdlib.h>
 #include <stdio.h>
-#include <ast.h>
+#include "ast.h"
 int yylex(void);
 void yyerror(const char *s);
 %}
 
+%union {
+        int ival;
+        char* sval;
+        AST_NODE* node;
+}
+
 %token INT VOID BOOL MAIN RETURN ID INT_VAL BOOL_VAL
 %token AND OR NEG
+
+%type <ival> INT_VAL BOOL_VAL
+%type <sval> ID
+%type <node> INT VOID BOOL MAIN RETURN AND OR NEG program P D stmt expr
 
 %right '='
 %left OR
@@ -16,10 +26,11 @@ void yyerror(const char *s);
 %left '*' '/'
 %right UMINUS NEG
 
+%start program
 
 %%
 
-program: INT M
+program: INT M { new_unary_node(NULL, OP_DECL_INT, $2); }
        | VOID M
        ;
 
@@ -35,33 +46,24 @@ D: INT ID
  | BOOL ID
  ;
 
-stmt: ID '=' expr { $$ = new_binary_node(ASSIGN, $1, $3); }
+stmt: ID '=' expr { $$.node = new_binary_node(OP_ASSIGN, $1.leaf, $3.node); }
     | expr        { $$ = $1; }
-    | RETURN expr { $$ = new_unary_node(RETURN, $2); }
-    | RETURN      { $$ = new_unary_node(RETURN, void); }
+    | RETURN expr { $$.node = new_unary_node(OP_RETURN, $2.node); }
+    | RETURN      { $$.node = new_unary_node(OP_RETURN, NULL); }
     ;
 
-expr: expr AND expr { $$ = new_binary_node(AND, $1, $3); }
-    | expr OR expr  { $$ = new_binary_node(OR, $1, $3); }
-    | sum_expr      { $$ = $1; }
+expr: INT_VAL               { $$.leaf = new_leaf_node(TYPE_INT, &$1.ival); }
+    | BOOL_VAL              { $$.leaf = new_leaf_node(TYPE_BOOL, &$1.ival); }
+    | ID                    { $$.leaf = new_leaf_node(TYPE_ID, $1.sval); }
+    | expr '+' expr         { $$.node = new_binary_node(OP_ADDITION, $1.node, $3.node); }
+    | expr '*' expr         { $$.node = new_binary_node(OP_MULTIPLICATION, $1.node, $3.node); }
+    | expr '/' expr         { $$.node = new_binary_node(OP_DIVISION, $1.node, $3.node); }
+    | expr '-' expr         { $$.node = new_binary_node(OP_SUBTRACTION, $1.node, $3.node); }
+    | '-' expr %prec UMINUS { $$.node = new_unary_node(OP_MINUS, $2.node); }
+    | '(' expr ')'          { $$ = $2; }
+    | expr AND expr         { $$.node = new_binary_node(OP_AND, $1.node, $3.node); }
+    | expr OR expr          { $$.node = new_binary_node(OP_OR, $1.node, $3.node); }
+    | NEG expr %prec NEG    { $$.node = new_unary_node(OP_NEG, $2.node); }
     ;
-
-sum_expr: sum_expr '+' term { $$ = new_binary_node(ADDITION, $1, $3); }
-        | sum_expr '-' term { $$ = new_binary_node(SUBTRACTION, $1, $3); }
-        | term              { $$ = $1; }
-        ;
-
-term: term '*' factor { $$ = new_binary_node(MULTIPLICATION, $1, $3); }
-    | term '/' factor { $$ = new_binary_node(DIVISION, $1, $3); }
-    | factor          { $$ = $1; }
-    ;
-
-factor: '-' factor %prec UMINUS { $$ = new_unary_node(MINUS, $2); }
-        | NEG factor %prec NEG  { $$ = new_unary_node(NEG, $2); }
-        | INT_VAL               { $$ = new_leaf_node(INT, $1); }
-        | BOOL_VAL              { $$ = new_leaf_node(BOOL, $1); }
-        | ID                    { $$ = new_leaf_node(ID, $1); }
-        | '(' expr ')'          { $$ = $2; }
-        ;
 
 %%
