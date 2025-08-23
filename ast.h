@@ -1,11 +1,19 @@
 #ifndef AST_H
 #define AST_H
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define true 1
 #define false 0
+
+int amount;
+// flag used for checking if the program should return an integer or void
+// assuming there's no other types main can return
+int returnInt?;
+AST_ROOT *head = NULL;
+AST_ROOT *end = NULL;
 
 typedef enum {
     UNARY,
@@ -34,12 +42,8 @@ typedef enum {
 } LEAF_TYPE;
 
 typedef struct AST_ROOT {
-    AST_ROOT *next;
     AST_NODE *sentence;
-    int amount;
-    // flag used for checking if the program should return an integer or void
-    // assuming there's no other types main can return
-    int returnInt? = true;
+    AST_ROOT *next;
 }
 
 typedef struct AST_NODE {
@@ -60,5 +64,7 @@ typedef struct AST_LEAF {
 AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left);
 AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right);
 AST_LEAF* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
+void create_root();
+void add_sentence();
 
 #endif //AST_H
