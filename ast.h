@@ -33,7 +33,6 @@ typedef enum {
     OP_RETURN,
     OP_DECL_INT,
     OP_DECL_BOOL,
-    OP_DECL_VOID
 } OPERATOR;
 
 typedef enum {
@@ -49,7 +48,9 @@ struct AST_NODE {
     OPERATOR op;
     struct AST_NODE *left;
     struct AST_NODE *right;
+    //flag for checking if the NODE is a leaf
     int is_leaf;
+    // this fields will remain NULL if is_leaf is false
     LEAF_TYPE leaf_type;
     void *value;
 };

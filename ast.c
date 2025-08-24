@@ -6,53 +6,55 @@ AST_ROOT *end = NULL;
 
 // function that allocates memory for each new node and initializes its fields by default
 static AST_NODE* alloc_node(void) {
-    AST_NODE* n = (AST_NODE*) malloc(sizeof(AST_NODE));
-    n->father = NULL;
-    n->left = n->right = NULL;
-    n->is_leaf = 0;
-    n->value = NULL;
-    return n;
+    AST_NODE* node = (AST_NODE*) malloc(sizeof(AST_NODE));
+    node->father = NULL;
+    node->left = node->right = NULL;
+    node->is_leaf = false;
+    node->value = NULL;
+    return node;
 }
 
 AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right) {
-    AST_NODE* n = alloc_node();
-    n->arity = BINARY;
-    n->op = opt;
-    n->left = left;
-    n->right = right;
-    if (left) left->father = n;
-    if (right) right->father = n;
-    n->father = fath;
-    return n;
+    AST_NODE* node = alloc_node();
+    node->arity = BINARY;
+    node->op = opt;
+    node->left = left;
+    node->right = right;
+    if (left) left->father = node;
+    if (right) right->father = node;
+    node->father = fath;
+    return node;
 }
 
 AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left) {
-    AST_NODE* n = alloc_node();
-    n->arity = UNARY;
-    n->op = opt;
-    n->left = left;
-    if (left) left->father = n;
-    n->father = fath;
-    return n;
+    AST_NODE* node = alloc_node();
+    node->arity = UNARY;
+    node->op = opt;
+    node->left = left;
+    if (left) left->father = node;
+    node->father = fath;
+    return node;
 }
 
 AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v) {
-    AST_NODE* n = alloc_node();
-    n->arity = UNARY;
-    n->is_leaf = 1;
-    n->leaf_type = type;
+    AST_NODE* node = alloc_node();
+    node->arity = UNARY;
+    node->is_leaf = true;
+    node->leaf_type = type;
     switch (type) {
         case TYPE_INT:
         case TYPE_BOOL:
-            n->value = malloc(sizeof(int));
-            memcpy(n->value, v, sizeof(int));
+			// allocate memory for an integer or bool and copy the value
+            node->value = malloc(sizeof(int));
+            memcpy(node->value, v, sizeof(int));
             break;
         case TYPE_ID:
-            n->value = strdup((char*)v);
+			// duplicate the string and store it in the node
+            node->value = strdup((char*)v);
             break;
     }
-    n->father = fath;
-    return n;
+    node->father = fath;
+    return node;
 }
 
 // creates the root list
