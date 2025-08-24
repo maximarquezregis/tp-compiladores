@@ -8,16 +8,16 @@
 #define true 1
 #define false 0
 
-int amount;
-// flag used for checking if the program should return an integer or void
-// assuming there's no other types main can return
-int returnInt?;
-AST_ROOT *head = NULL;
-AST_ROOT *end = NULL;
+typedef struct AST_NODE AST_NODE;
+typedef struct AST_ROOT AST_ROOT;
+
+extern int returnInt;
+extern AST_ROOT *head;
+extern AST_ROOT *end;
 
 typedef enum {
     UNARY,
-    BINARY,
+    BINARY
 } OPERATOR_ARITY;
 
 typedef enum {
@@ -32,7 +32,8 @@ typedef enum {
     OP_ASSIGN,
     OP_RETURN,
     OP_DECL_INT,
-	OP_DECL_BOOL
+    OP_DECL_BOOL,
+    OP_DECL_VOID
 } OPERATOR;
 
 typedef enum {
@@ -41,30 +42,27 @@ typedef enum {
     TYPE_ID
 } LEAF_TYPE;
 
-typedef struct AST_ROOT {
-    AST_NODE *sentence;
-    AST_ROOT *next;
-}
-
-typedef struct AST_NODE {
+struct AST_NODE {
     struct AST_NODE *father;
     OPERATOR_ARITY arity;
+	// undefined if is_leaf is true and not a decl/return/etc
     OPERATOR op;
     struct AST_NODE *left;
-    // for unary nodes, use only the left child
     struct AST_NODE *right;
-} AST_NODE;
-
-typedef struct AST_LEAF {
-    struct AST_NODE *father;
-    LEAF_TYPE type;
+    int is_leaf;
+    LEAF_TYPE leaf_type;
     void *value;
-} AST_LEAF;
+};
+
+struct AST_ROOT {
+    AST_NODE *sentence;
+    AST_ROOT *next;
+};
 
 AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left);
 AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right);
-AST_LEAF* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
-void create_root();
-void add_sentence();
+AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
+void create_root(AST_NODE* tree);
+void add_sentence(AST_NODE* tree);
 
-#endif //AST_H
+#endif
