@@ -7,17 +7,17 @@ void yyerror(const char *s);
 %}
 
 %union {
-        int ival;
-        char* sval;
-        AST_NODE* node;
+    int ival;
+    char* sval;
+    AST_NODE* node;
 }
 
 %token INT VOID BOOL MAIN RETURN ID INT_VAL BOOL_VAL
 %token AND OR NEG
 
-%type <ival> INT_VAL BOOL_VAL
+%type <node> program M P D stmt expr
 %type <sval> ID
-%type <node> INT VOID BOOL MAIN RETURN AND OR NEG program P D stmt expr
+%type <ival> INT_VAL BOOL_VAL
 
 %right '='
 %left OR
@@ -30,40 +30,59 @@ void yyerror(const char *s);
 
 %%
 
-program: INT M { new_unary_node(NULL, OP_DECL_INT, $2); }
-       | VOID M
-       ;
-
-M: MAIN '(' ')' '{' P '}'
- ;
-
-P: D ';' P
- | stmt ';' P
- |
- ;
-
-D: INT ID
- | BOOL ID
- ;
-
-stmt: ID '=' expr { $$.node = new_binary_node(OP_ASSIGN, $1.leaf, $3.node); }
-    | expr        { $$ = $1; }
-    | RETURN expr { $$.node = new_unary_node(OP_RETURN, $2.node); }
-    | RETURN      { $$.node = new_unary_node(OP_RETURN, NULL); }
+program
+    : INT M  { returnInt = true; }
+    | VOID M { returnInt = false; }
     ;
 
-expr: INT_VAL               { $$.leaf = new_leaf_node(TYPE_INT, &$1.ival); }
-    | BOOL_VAL              { $$.leaf = new_leaf_node(TYPE_BOOL, &$1.ival); }
-    | ID                    { $$.leaf = new_leaf_node(TYPE_ID, $1.sval); }
-    | expr '+' expr         { $$.node = new_binary_node(OP_ADDITION, $1.node, $3.node); }
-    | expr '*' expr         { $$.node = new_binary_node(OP_MULTIPLICATION, $1.node, $3.node); }
-    | expr '/' expr         { $$.node = new_binary_node(OP_DIVISION, $1.node, $3.node); }
-    | expr '-' expr         { $$.node = new_binary_node(OP_SUBTRACTION, $1.node, $3.node); }
-    | '-' expr %prec UMINUS { $$.node = new_unary_node(OP_MINUS, $2.node); }
+M
+    : MAIN '(' ')' '{' P '}' { }
+    ;
+
+P
+    : P D ';'    { add_sentence($2); }
+    | P stmt ';' { add_sentence($2); }
+    |
+    ;
+
+D
+    : INT ID  {
+        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $2);
+        $$ = new_unary_node(NULL, OP_DECL_INT, id);
+      }
+    | BOOL ID {
+        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $2);
+        $$ = new_unary_node(NULL, OP_DECL_BOOL, id);
+      }
+    ;
+
+stmt
+    : ID '=' expr {
+        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $1);
+        $$ = new_binary_node(NULL, OP_ASSIGN, id, $3);
+      }
+    | expr        { $$ = $1; }
+    | RETURN expr { $$ = new_unary_node(NULL, OP_RETURN, $2); }
+    | RETURN      { $$ = new_unary_node(NULL, OP_RETURN, NULL); }
+    ;
+
+expr
+    : INT_VAL               { $$ = new_leaf_node(NULL, TYPE_INT, &$1); }
+    | BOOL_VAL              { $$ = new_leaf_node(NULL, TYPE_BOOL, &$1); }
+    | ID                    { $$ = new_leaf_node(NULL, TYPE_ID, $1); }
+    | expr '+' expr         { $$ = new_binary_node(NULL, OP_ADDITION, $1, $3); }
+    | expr '*' expr         { $$ = new_binary_node(NULL, OP_MULTIPLICATION, $1, $3); }
+    | expr '/' expr         { $$ = new_binary_node(NULL, OP_DIVISION, $1, $3); }
+    | expr '-' expr         { $$ = new_binary_node(NULL, OP_SUBTRACTION, $1, $3); }
+    | '-' expr %prec UMINUS { $$ = new_unary_node(NULL, OP_MINUS, $2); }
     | '(' expr ')'          { $$ = $2; }
-    | expr AND expr         { $$.node = new_binary_node(OP_AND, $1.node, $3.node); }
-    | expr OR expr          { $$.node = new_binary_node(OP_OR, $1.node, $3.node); }
-    | NEG expr %prec NEG    { $$.node = new_unary_node(OP_NEG, $2.node); }
+    | expr AND expr         { $$ = new_binary_node(NULL, OP_AND, $1, $3); }
+    | expr OR expr          { $$ = new_binary_node(NULL, OP_OR, $1, $3); }
+    | NEG expr %prec NEG    { $$ = new_unary_node(NULL, OP_NEG, $2); }
     ;
 
 %%
+
+void yyerror(const char *s){
+    fprintf(stderr,"-> ERROR sintactico: %s\n", s);
+}
