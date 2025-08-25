@@ -11,9 +11,13 @@
 typedef struct AST_NODE AST_NODE;
 typedef struct AST_ROOT AST_ROOT;
 
+// flag used for checking if the program should return an integer or void
+// assuming there's no other types main can return
 extern int returnInt;
 extern AST_ROOT *head;
 extern AST_ROOT *end;
+// identifiers' table
+extern
 
 typedef enum {
     UNARY,
@@ -65,5 +69,7 @@ AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE
 AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
 void create_root(AST_NODE* tree);
 void add_sentence(AST_NODE* tree);
+void print_program(void);
+void print_node(AST_NODE *node, const char *prefix, int is_last);
 
 #endif
