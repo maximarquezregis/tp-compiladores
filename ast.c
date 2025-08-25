@@ -15,7 +15,7 @@ static AST_NODE* alloc_node(void) {
     return node;
 }
 
-AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right) {
+AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right) {
     AST_NODE* node = alloc_node();
     node->arity = BINARY;
     node->op = opt;
@@ -23,22 +23,20 @@ AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE
     node->right = right;
     if (left) left->father = node;
     if (right) right->father = node;
-    node->father = fath;
     return node;
 }
 
-AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left) {
+AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* left) {
     AST_NODE* node = alloc_node();
     node->arity = UNARY;
     node->op = opt;
     node->left = left;
 	// for unary nodes we always use the left child
     if (left) left->father = node;
-    node->father = fath;
     return node;
 }
 
-AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v) {
+AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
     AST_NODE* node = alloc_node();
     node->arity = UNARY;
     node->is_leaf = true;
@@ -52,11 +50,10 @@ AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v) {
             break;
         case TYPE_ID:
 			// duplicate the string and store it in the node
-			id_table =
+            // id table = 
             node->value = strdup((char*)v);
             break;
     }
-    node->father = fath;
     return node;
 }
 
@@ -92,7 +89,7 @@ int interpreter(AST_NODE* tree) {
         switch (tree->leaf_type){
             case TYPE_INT:      tree->value;
             case TYPE_BOOL:     tree->value;
-            case TYPE_ID:       global_values[tree->value];
+            //case TYPE_ID:       global_values[tree->value];
 
             default:          error("Interpreter: unknown tree type %d\n", tree->leaf_type);
         }
@@ -109,7 +106,7 @@ int interpreter(AST_NODE* tree) {
             case OP_AND:                return interpreter(tree->left) && interpreter(tree->right);
             case OP_OR:                 return interpreter(tree->left) || interpreter(tree->right);
             case OP_NEG:                return ! interpreter(tree->left);
-            case OP_ASSIGN:             return global_values[tree->left->value] = interpreter(tree->right);
+            //case OP_ASSIGN:             return global_values[tree->left->value] = interpreter(tree->right);
 
             default:          error("Interpreter: unknown tree type %d\n", tree->op);
         }
@@ -181,7 +178,8 @@ void print_node(AST_NODE *node, const char *prefix, int is_last) {
     }
 }
 
-void print_program(void) {
+// print tree horizontal
+void print_program_horizontal(void) {
     printf("=== AST del programa ===\n");
     AST_ROOT *cur = head;
     int idx = 0;
@@ -191,4 +189,61 @@ void print_program(void) {
         cur = cur->next;
     }
     printf("========================\n");
+}
+
+static void print_spaces(int n) {
+    for (int i = 0; i < n; ++i) putchar(' ');
+}
+
+// print tree in ASCII
+void print_tree_ascii(AST_NODE *node, int depth, int is_left) {
+    if (!node) return;
+
+    // print right child
+    if (node->arity == BINARY && node->right) {
+        print_tree_ascii(node->right, depth + 1, 0);
+    }
+
+    // print current node
+    print_spaces(depth * 5);
+    if (depth > 0) {
+        if (is_left)
+            printf("/----");
+        else
+            printf("\\----");
+    }
+
+    if (node->is_leaf) {
+        switch (node->leaf_type) {
+            case TYPE_INT:
+                printf("%d\n", *(int*)node->value);
+                break;
+            case TYPE_BOOL:
+                printf("%s\n", (*(int*)node->value) ? "true" : "false");
+                break;
+            case TYPE_ID:
+                printf("%s\n", (char*)node->value);
+                break;
+        }
+    } else {
+        printf("%s\n", op_to_string(node->op));
+    }
+
+    // print left child
+    if (node->left) {
+        print_tree_ascii(node->left, depth + 1, 1);
+    }
+}
+
+// print tree vertical
+void print_program_vertical(void) {
+    printf("=== AST del programa ===\n");
+    AST_ROOT *cur = head;
+    int idx = 0;
+    while (cur) {
+        printf("\nSentencia %d\n\n", idx++);
+        print_tree_ascii(cur->sentence, 0, 0);
+        cur = cur->next;
+    }
+    printf("\n========================\n");
 }

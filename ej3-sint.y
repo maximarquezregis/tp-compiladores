@@ -36,7 +36,8 @@ program
     ;
 
 M
-    : MAIN '(' ')' '{' P '}' { }
+    : MAIN '(' ')' '{' P '}' { } { printf("No hay errores sintacticos \n"); } 
+
     ;
 
 P
@@ -47,38 +48,38 @@ P
 
 D
     : INT ID  {
-        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $2);
-        $$ = new_unary_node(NULL, OP_DECL_INT, id);
+        AST_NODE* id = new_leaf_node(TYPE_ID, $2);
+        $$ = new_unary_node(OP_DECL_INT, id);
       }
     | BOOL ID {
-        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $2);
-        $$ = new_unary_node(NULL, OP_DECL_BOOL, id);
+        AST_NODE* id = new_leaf_node(TYPE_ID, $2);
+        $$ = new_unary_node(OP_DECL_BOOL, id);
       }
     ;
 
 stmt
     : ID '=' expr {
-        AST_NODE* id = new_leaf_node(NULL, TYPE_ID, $1);
-        $$ = new_binary_node(NULL, OP_ASSIGN, id, $3);
+        AST_NODE* id = new_leaf_node(TYPE_ID, $1);
+        $$ = new_binary_node(OP_ASSIGN, id, $3);
       }
     | expr        { $$ = $1; }
-    | RETURN expr { $$ = new_unary_node(NULL, OP_RETURN, $2); }
-    | RETURN      { $$ = new_unary_node(NULL, OP_RETURN, NULL); }
+    | RETURN expr { $$ = new_unary_node(OP_RETURN, $2); }
+    | RETURN      { $$ = new_unary_node(OP_RETURN, NULL); }
     ;
 
 expr
-    : INT_VAL               { $$ = new_leaf_node(NULL, TYPE_INT, &$1); }
-    | BOOL_VAL              { $$ = new_leaf_node(NULL, TYPE_BOOL, &$1); }
-    | ID                    { $$ = new_leaf_node(NULL, TYPE_ID, $1); }
-    | expr '+' expr         { $$ = new_binary_node(NULL, OP_ADDITION, $1, $3); }
-    | expr '*' expr         { $$ = new_binary_node(NULL, OP_MULTIPLICATION, $1, $3); }
-    | expr '/' expr         { $$ = new_binary_node(NULL, OP_DIVISION, $1, $3); }
-    | expr '-' expr         { $$ = new_binary_node(NULL, OP_SUBTRACTION, $1, $3); }
-    | '-' expr %prec UMINUS { $$ = new_unary_node(NULL, OP_MINUS, $2); }
+    : INT_VAL               { $$ = new_leaf_node(TYPE_INT, &$1); }
+    | BOOL_VAL              { $$ = new_leaf_node(TYPE_BOOL, &$1); }
+    | ID                    { $$ = new_leaf_node(TYPE_ID, $1); }
+    | expr '+' expr         { $$ = new_binary_node(OP_ADDITION, $1, $3); }
+    | expr '*' expr         { $$ = new_binary_node(OP_MULTIPLICATION, $1, $3); }
+    | expr '/' expr         { $$ = new_binary_node(OP_DIVISION, $1, $3); }
+    | expr '-' expr         { $$ = new_binary_node(OP_SUBTRACTION, $1, $3); }
+    | '-' expr %prec UMINUS { $$ = new_unary_node(OP_MINUS, $2); }
     | '(' expr ')'          { $$ = $2; }
-    | expr AND expr         { $$ = new_binary_node(NULL, OP_AND, $1, $3); }
-    | expr OR expr          { $$ = new_binary_node(NULL, OP_OR, $1, $3); }
-    | NEG expr %prec NEG    { $$ = new_unary_node(NULL, OP_NEG, $2); }
+    | expr AND expr         { $$ = new_binary_node(OP_AND, $1, $3); }
+    | expr OR expr          { $$ = new_binary_node(OP_OR, $1, $3); }
+    | NEG expr %prec NEG    { $$ = new_unary_node(OP_NEG, $2); }
     ;
 
 %%

@@ -39,5 +39,7 @@ int main(int argc,char *argv[]){
     if (argc > 0) yyin = fopen(argv[0],"r");
     else yyin = stdin;
     yyparse();
+    //print_program_horizontal();
+    print_program_vertical();
     return 0;
 }

@@ -18,7 +18,7 @@ extern AST_ROOT *head;
 extern AST_ROOT *end;
 // identifiers' table
 extern
-
+char **id_table;
 typedef enum {
     UNARY,
     BINARY
@@ -64,9 +64,9 @@ struct AST_ROOT {
     AST_ROOT *next;
 };
 
-AST_NODE* new_unary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left);
-AST_NODE* new_binary_node(AST_NODE* fath, OPERATOR opt, AST_NODE* left, AST_NODE* right);
-AST_NODE* new_leaf_node(AST_NODE* fath, LEAF_TYPE type, void* v);
+AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* left);
+AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right);
+AST_NODE* new_leaf_node(LEAF_TYPE type, void* v);
 void create_root(AST_NODE* tree);
 void add_sentence(AST_NODE* tree);
 void print_program(void);
