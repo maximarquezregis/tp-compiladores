@@ -18,6 +18,7 @@ ID_TABLE* add_id(char* name) {
 	return end;
 }
 
+// adds data to the variable name node
 void add_data(char* name, LEAF_TYPE type, void* data) {
 	ID_TABLE* aux = find(name);
 	if (aux == NULL) {
@@ -28,10 +29,12 @@ void add_data(char* name, LEAF_TYPE type, void* data) {
 	return;
 }
 
-// returns the memory direction of the node with id_name = name
+/* returns the memory direction of the node with id_name = name
+   if the node is not found, returns NULL */
 ID_TABLE* find(char* name) {
 	ID_TABLE* aux = malloc(sizeof(ID_TABLE*));
 	aux = head;
+
 	while(strcmp(aux->id_name, name) && aux != NULL) {
 		aux = aux->next;
 	}
@@ -39,9 +42,11 @@ ID_TABLE* find(char* name) {
 	return aux;
 }
 
+// allocate memory for a node in the simbols' table
 ID_TABLE* allocate_mem() {
 	ID_TABLE* aux = malloc(sizeof(ID_TABLE));
 
+	// initializes all data to NULL
 	aux->id_name = NULL;
 	aux->id_type = NULL;
 	aux->data = NULL;
