@@ -41,18 +41,26 @@ AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
     node->arity = UNARY;
     node->is_leaf = true;
     node->leaf_type = type;
+
     switch (type) {
-        case TYPE_INT:
-        case TYPE_BOOL:
-			// allocate memory for an integer or bool and copy the value
-            node->value = malloc(sizeof(int));
-            memcpy(node->value, v, sizeof(int));
+        case TYPE_INT: {
+			// allocate memory for the union INT_LEAF and set its fields
+            node->value = malloc(sizeof(union LEAF));
+            node->value->int_leaf.type = type;
+            node->value->int_leaf.value = *(int*)v;
             break;
-        case TYPE_ID:
-			// duplicate the string and store it in the node
-            // id table = 
-            node->value = strdup((char*)v);
+        }
+        case TYPE_BOOL: {
+			// allocate memory for the BOOL_LEAF and set its fields
+            node->value = malloc(sizeof(union LEAF));
+            node->value->bool_leaf.type = TYPE_BOOL;
+            node->value->bool_leaf.value = (*(int*)v) ? true : false;
             break;
+        }
+        case TYPE_ID: {
+
+            break;
+        }
     }
     return node;
 }
@@ -91,7 +99,7 @@ int interpreter(AST_NODE* tree) {
             case TYPE_BOOL:     tree->value;
             //case TYPE_ID:       global_values[tree->value];
 
-            default:          error("Interpreter: unknown tree type %d\n", tree->leaf_type);
+            // default:          error("Interpreter: unknown tree type %d\n", tree->leaf_type);
         }
     } else {
         switch (tree->op){
@@ -108,7 +116,7 @@ int interpreter(AST_NODE* tree) {
             case OP_NEG:                return ! interpreter(tree->left);
             //case OP_ASSIGN:             return global_values[tree->left->value] = interpreter(tree->right);
 
-            default:          error("Interpreter: unknown tree type %d\n", tree->op);
+            // default:          error("Interpreter: unknown tree type %d\n", tree->op);
         }
     }
     return 0;

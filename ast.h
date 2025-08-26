@@ -10,6 +10,8 @@
 
 typedef struct AST_NODE AST_NODE;
 typedef struct AST_ROOT AST_ROOT;
+typedef struct INT_LEAF INT_LEAF;
+typedef struct BOOL_LEAF BOOL_LEAF;
 
 // flag used for checking if the program should return an integer or void
 // assuming there's no other types main can return
@@ -17,8 +19,7 @@ extern int returnInt;
 extern AST_ROOT *head;
 extern AST_ROOT *end;
 // identifiers' table
-extern
-char **id_table;
+
 typedef enum {
     UNARY,
     BINARY
@@ -45,6 +46,21 @@ typedef enum {
     TYPE_ID
 } LEAF_TYPE;
 
+struct INT_LEAF {
+    LEAF_TYPE type;
+    int value;
+};
+
+struct BOOL_LEAF {
+    LEAF_TYPE type;
+    int value;
+};
+
+union LEAF {
+    INT_LEAF int_leaf;
+    BOOL_LEAF bool_leaf;
+};
+
 struct AST_NODE {
     struct AST_NODE *father;
     OPERATOR_ARITY arity;
@@ -52,11 +68,11 @@ struct AST_NODE {
     OPERATOR op;
     struct AST_NODE *left;
     struct AST_NODE *right;
-    //flag for checking if the NODE is a leaf
+    // flag for checking if the NODE is a leaf
     int is_leaf;
     // this fields will remain NULL if is_leaf is false
-    LEAF_TYPE leaf_type;
-    void *value;
+    LEAF_TYPE leaf_type; // preguntar si este campo es redundante ya que tenemos el mismo en value->type
+    union LEAF *value;
 };
 
 struct AST_ROOT {
