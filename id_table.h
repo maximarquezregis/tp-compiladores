@@ -1,23 +1,33 @@
-#ifndef PREPROYECTO_ID_TABLE_H
-#define PREPROYECTO_ID_TABLE_H
+#ifndef ID_TABLE_H
+#define ID_TABLE_H
 
-#include "ast.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <stddef.h>
 
-extern ID_TABLE* head;
-extern ID_TABLE* end;
+typedef struct ID_TABLE ID_TABLE;
 
-typedef struct ID_TABLE;
+extern ID_TABLE* head_table;
+extern ID_TABLE* end_table;
+
+typedef enum {
+	CONST_INT,
+	CONST_BOOL,
+	UNKNOWN
+} ID_TYPE;
 
 struct ID_TABLE {
 	char* id_name;
-	LEAF_TYPE id_type;
-	int* data;
+	ID_TYPE id_type;
+	void* data;
 	ID_TABLE* next;
-}
+};
 
-ID_TABLE* add_id(char* name);
-void add_data(char* name, LEAF_TYPE type, void* data);
+ID_TABLE* allocate_mem();
+ID_TABLE* add_id(char* name, ID_TYPE type);
+void add_data(char* name, ID_TYPE type, void* data);
 ID_TABLE* find(char* name);
+void print_id_table(void);
 
 #endif
