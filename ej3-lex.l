@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "print_funcs.h"
 #include "ej3-sint.tab.h"
 int yyparse(void);
 void yyerror(const char *s);
@@ -39,7 +40,7 @@ int main(int argc,char *argv[]){
     if (argc > 0) yyin = fopen(argv[0],"r");
     else yyin = stdin;
     yyparse();
-    //print_program_horizontal();
-    print_program_vertical();
+    print_program_horizontal();
+    print_id_table();
     return 0;
 }

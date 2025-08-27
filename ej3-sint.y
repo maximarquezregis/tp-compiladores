@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "ast.h"
+#include "id_table.h"
 int yylex(void);
 void yyerror(const char *s);
 %}
@@ -48,10 +49,12 @@ P
 
 D
     : INT ID  {
+        add_id($2, CONST_INT);
         AST_NODE* id = new_leaf_node(TYPE_ID, $2);
         $$ = new_unary_node(OP_DECL_INT, id);
       }
     | BOOL ID {
+        add_id($2, CONST_BOOL);
         AST_NODE* id = new_leaf_node(TYPE_ID, $2);
         $$ = new_unary_node(OP_DECL_BOOL, id);
       }
