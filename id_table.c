@@ -34,6 +34,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
 	aux->id_type = type;
 
 	switch(type) {
+		// allocate memory and copy data into the node
         case CONST_BOOL:
             aux->data = malloc(sizeof(int));
             memcpy(aux->data, data, sizeof(int));
@@ -46,8 +47,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
             fprintf(stderr, "ERROR: variable '%s' no declarada\n", name);
         	exit(EXIT_FAILURE);
     }
-	aux->data = malloc(sizeof(int));
-	memcpy(aux->data, data, sizeof(int));
+
 	return;
 }
 

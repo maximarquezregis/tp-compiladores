@@ -8,6 +8,7 @@
 
 typedef struct ID_TABLE ID_TABLE;
 
+// pointers to the start and end of id_table
 extern ID_TABLE* head_table;
 extern ID_TABLE* end_table;
 
@@ -17,6 +18,7 @@ typedef enum {
 	UNKNOWN
 } ID_TYPE;
 
+// node type for id_Table
 struct ID_TABLE {
 	char* id_name;
 	ID_TYPE id_type;

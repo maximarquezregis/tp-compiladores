@@ -21,7 +21,6 @@ typedef struct BOOL_LEAF BOOL_LEAF;
 extern int returnInt;
 extern AST_ROOT *head_ast;
 extern AST_ROOT *end_ast;
-// identifiers' table
 
 typedef enum {
     UNARY,
