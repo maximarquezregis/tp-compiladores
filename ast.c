@@ -61,7 +61,7 @@ AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
 			// finds the memory direction of the node in the symbols' table that contains id
 			ID_TABLE* aux = find((char*) v);
 			if (aux == NULL) {
-				fprintf(stderr, "ERROR: variable '%s' no declarada\n", (char*) v);
+				fprintf(stderr, "ERROR: variable '%s' not declared\n", (char*) v);
         		exit(EXIT_FAILURE);
 			} else {
 				node->value = malloc(sizeof(union LEAF));

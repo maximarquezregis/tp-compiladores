@@ -28,7 +28,7 @@ ID_TABLE* add_id(char* name, ID_TYPE type) {
 void add_data(char* name, ID_TYPE type, void* data) {
 	ID_TABLE* aux = find(name);
 	if (aux == NULL) {
-		fprintf(stderr, "ERROR: variable '%s' no declarada\n", name);
+		fprintf(stderr, "ERROR: variable '%s' not declared\n", name);
         exit(EXIT_FAILURE);
 	}
 	aux->id_type = type;
@@ -44,7 +44,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
             memcpy(aux->data, data, sizeof(int));
             return;
         case UNKNOWN:
-            fprintf(stderr, "ERROR: variable '%s' no declarada\n", name);
+            fprintf(stderr, "ERROR: variable '%s' not declared\n", name);
         	exit(EXIT_FAILURE);
     }
 
