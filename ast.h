@@ -4,9 +4,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "id_table.h"
 
 #define true 1
 #define false 0
+
+struct ID_TABLE;
 
 typedef struct AST_NODE AST_NODE;
 typedef struct AST_ROOT AST_ROOT;
@@ -16,8 +19,8 @@ typedef struct BOOL_LEAF BOOL_LEAF;
 // flag used for checking if the program should return an integer or void
 // assuming there's no other types main can return
 extern int returnInt;
-extern AST_ROOT *head;
-extern AST_ROOT *end;
+extern AST_ROOT *head_ast;
+extern AST_ROOT *end_ast;
 // identifiers' table
 
 typedef enum {
@@ -41,9 +44,9 @@ typedef enum {
 } OPERATOR;
 
 typedef enum {
-    TYPE_INT,
-    TYPE_BOOL,
-    TYPE_ID
+	TYPE_INT,
+	TYPE_BOOL,
+	TYPE_ID
 } LEAF_TYPE;
 
 struct INT_LEAF {
@@ -59,6 +62,7 @@ struct BOOL_LEAF {
 union LEAF {
     INT_LEAF int_leaf;
     BOOL_LEAF bool_leaf;
+    ID_TABLE* id_leaf;
 };
 
 struct AST_NODE {
@@ -71,7 +75,7 @@ struct AST_NODE {
     // flag for checking if the NODE is a leaf
     int is_leaf;
     // this fields will remain NULL if is_leaf is false
-    LEAF_TYPE leaf_type; // preguntar si este campo es redundante ya que tenemos el mismo en value->type
+    LEAF_TYPE leaf_type;
     union LEAF *value;
 };
 
