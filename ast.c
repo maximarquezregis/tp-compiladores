@@ -18,7 +18,7 @@ static AST_NODE* alloc_node(void) {
 // function that frees memory of node and its children
 void free_mem(AST_NODE* node) {
 	if (node->is_leaf) {
-		free(value);
+		free(node->value);
 	} else if (node->arity == UNARY && !node->is_leaf) {
 		free_mem(node->left);
 	} else {
