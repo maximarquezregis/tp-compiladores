@@ -15,6 +15,20 @@ static AST_NODE* alloc_node(void) {
     return node;
 }
 
+// function that frees memory of node and its children
+void free_mem(AST_NODE* node) {
+	if (node->is_leaf) {
+		free(value);
+	} else if (node->arity == UNARY && !node->is_leaf) {
+		free_mem(node->left);
+	} else {
+		free_mem(node->left);
+		free_mem(node->right);
+	}
+
+	free(node);
+}
+
 AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right) {
     AST_NODE* node = alloc_node();
     node->arity = BINARY;
