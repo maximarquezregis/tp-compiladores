@@ -31,8 +31,12 @@ void add_data(char* name, ID_TYPE type, void* data) {
 		fprintf(stderr, "ERROR: variable '%s' not declared\n", name);
         exit(EXIT_FAILURE);
 	}
-	aux->id_type = type;
+	if (aux->id_type != type) {
+		fprintf(stderr, "ERROR: error de tipo en la asignacion a la variable %s \n", name);
+		exit(EXIT_FAILURE);
+	}
 
+	free(aux->data);
 	switch(type) {
 		// allocate memory and copy data into the node
         case CONST_BOOL:
@@ -77,4 +81,10 @@ ID_TABLE* allocate_mem() {
 	aux->next = NULL;
 
 	return aux;
+}
+
+// retrieves data of id from table
+void* get_data(char* name) {
+	ID_TABLE* aux = find(name);
+	return aux->data;
 }

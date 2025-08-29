@@ -31,5 +31,6 @@ ID_TABLE* add_id(char* name, ID_TYPE type);
 void add_data(char* name, ID_TYPE type, void* data);
 ID_TABLE* find(char* name);
 void print_id_table(void);
+void* get_data(char* name);
 
 #endif
