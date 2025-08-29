@@ -1,24 +1,29 @@
+#define _GNU_SOURCE
 #include "id_table.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 ID_TABLE* head_table = NULL;
 ID_TABLE* end_table = NULL;
 
 // creates a new node with id_name = name and returns its memory direction
 ID_TABLE* add_id(char* name, ID_TYPE type) {
+	// Check for redeclaration BEFORE adding to table
+	if(find(name) != NULL) {
+		fprintf(stderr, "ERROR: variable '%s' redeclared\n", name);
+        exit(EXIT_FAILURE);
+	}
+
 	ID_TABLE* aux = allocate_mem();
 	if (end_table == NULL) {
 		end_table = head_table = aux;
 	} else {
 		end_table->next = aux;
+		end_table = aux;
 	}
-	if(find(name) != NULL) {
-		fprintf(stderr, "ERROR: variable '%s' redeclared\n", name);
-        exit(EXIT_FAILURE);
-	}
-	end_table = aux;
+
 	end_table->id_name = strdup((char*)name);
 	end_table->id_type = type;
 	return end_table;
@@ -36,7 +41,11 @@ void add_data(char* name, ID_TYPE type, void* data) {
 		exit(EXIT_FAILURE);
 	}
 
-	free(aux->data);
+	// Only free if data was previously allocated
+	if (aux->data != NULL) {
+		free(aux->data);
+	}
+
 	switch(type) {
 		// allocate memory and copy data into the node
         case CONST_BOOL:
