@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "ast.h"
+#include "pas.h"
 #include "print_funcs.h"
 #include "ej3-sint.tab.h"
 int yyparse(void);
