@@ -42,5 +42,9 @@ int main(int argc,char *argv[]){
     yyparse();
     print_program_horizontal();
     print_id_table();
+    // for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
+    //    genCode(cur->sentence);
+    //}
+    //printCodeToFile("file.txt");
     return 0;
 }
