@@ -1,11 +1,15 @@
 %{
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include "ast.h"
 #include "print_funcs.h"
 #include "ej3-sint.tab.h"
 int yyparse(void);
 void yyerror(const char *s);
+char *strdup(const char *s);
 %}
 
 %option noyywrap
@@ -42,9 +46,9 @@ int main(int argc,char *argv[]){
     yyparse();
     print_program_horizontal();
     print_id_table();
-    // for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
-    //    genCode(cur->sentence);
-    //}
-    //printCodeToFile("file.txt");
+    for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
+        genCode(cur->sentence);
+    }
+    printCodeToFile("file.txt");
     return 0;
 }
