@@ -7,6 +7,7 @@
 #include "ast.h"
 #include "pas.h"
 #include "print_funcs.h"
+#include "interpreter.h"
 #include "ej3-sint.tab.h"
 int yyparse(void);
 void yyerror(const char *s);
@@ -46,10 +47,9 @@ int main(int argc,char *argv[]){
     else yyin = stdin;
     yyparse();
     print_program_horizontal();
-    print_id_table();
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
-        genCode(cur->sentence);
+       interpreter(cur->sentence);
     }
-    printCodeToFile("file.txt");
+    print_id_table();
     return 0;
 }

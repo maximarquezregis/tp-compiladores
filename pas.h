@@ -1,3 +1,5 @@
+#include "ast.h"
+
 // Instruction types for the pseudo-assembly
 typedef enum {
     I_LOAD,

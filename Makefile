@@ -12,7 +12,7 @@ GEN_Y_TAB_H   = ej3-sint.tab.h
 LEX_FILE      = ej3-lex.l
 YACC_FILE     = ej3-sint.y
 
-SRCS = ast.c id_table.c print_funcs.c
+SRCS = ast.c id_table.c print_funcs.c interpreter.c pas.c
 OBJS = $(SRCS:.c=.o) $(GEN_LEX_SRC:.c=.o) $(GEN_Y_TAB_C:.c=.o)
 
 .PHONY: all clean

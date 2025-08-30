@@ -37,7 +37,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
         exit(EXIT_FAILURE);
 	}
 	if (aux->id_type != type) {
-		fprintf(stderr, "ERROR: error de tipo en la asignacion a la variable %s \n", name);
+		fprintf(stderr, "ERROR: type mismatch in assignment to variable '%s'\n", name);
 		exit(EXIT_FAILURE);
 	}
 

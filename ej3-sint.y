@@ -37,7 +37,7 @@ program
     ;
 
 M
-    : MAIN '(' ')' '{' P '}' { } { printf("No hay errores sintacticos \n"); } 
+    : MAIN '(' ')' '{' P '}' { } { printf("No syntactic errors.\n"); }
 
     ;
 
@@ -88,5 +88,5 @@ expr
 %%
 
 void yyerror(const char *s){
-    fprintf(stderr,"-> ERROR sintactico: %s\n", s);
+    fprintf(stderr,"-> Syntax ERROR: %s\n", s);
 }

@@ -62,11 +62,11 @@ void print_node(AST_NODE *node, const char *prefix, int is_last) {
 }
 
 void print_program_horizontal(void) {
-    printf("=== AST del programa ===\n");
+    printf("=== Program AST ===\n");
     AST_ROOT *cur = head_ast;
     int idx = 0;
     while (cur) {
-        printf("Sentencia %d\n", idx++);
+        printf("Statement %d\n", idx++);
         print_node(cur->sentence, "", 1);
         cur = cur->next;
     }
@@ -114,11 +114,11 @@ void print_tree_ascii(AST_NODE *node, int depth, int is_left) {
 }
 
 void print_program_vertical(void) {
-    printf("=== AST del programa ===\n");
+    printf("=== Program AST ===\n");
     AST_ROOT *cur = head_ast;
     int idx = 0;
     while (cur) {
-        printf("\nSentencia %d\n\n", idx++);
+        printf("\nStatement %d\n\n", idx++);
         print_tree_ascii(cur->sentence, 0, 0);
         cur = cur->next;
     }
