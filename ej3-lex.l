@@ -47,9 +47,13 @@ int main(int argc,char *argv[]){
     else yyin = stdin;
     yyparse();
     print_program_horizontal();
+    extern int alreadyReturned;
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
        interpreter(cur->sentence);
        genCode(cur->sentence);
+       if (alreadyReturned) {
+            break;
+       }
     }
     printCodeToFile("assembly/genAssembly.txt");
     print_id_table();

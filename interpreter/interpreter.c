@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "interpreter.h"
 
+int alreadyReturned = 0;
+
 /*
  * Recursively evaluates an AST node and returns its integer value.
  * Booleans are represented as 0 (false) or 1 (true).
@@ -88,16 +90,22 @@ static int eval(AST_NODE *tree) {
             // Declaration already recorded in symbol table by parser; do not evaluate identifier
             return 0;
         case OP_RETURN: {
-            if (!tree->left && returnInt) {
-                fprintf(stderr, "ERROR: main returns void when it should return int \n");
-                exit(EXIT_FAILURE);
-            } else if (!returnInt && tree->left) {
-                fprintf(stderr, "ERROR: main returns int when it should return void \n");
-                exit(EXIT_FAILURE);
+            if (!alreadyReturned) {
+                if (!tree->left && returnInt) {
+                    fprintf(stderr, "ERROR: main returns void when it should return int \n");
+                    exit(EXIT_FAILURE);
+                } else if (!returnInt && tree->left) {
+                    fprintf(stderr, "ERROR: main returns int when it should return void \n");
+                    exit(EXIT_FAILURE);
+                } else {
+                    int return_value = eval(tree->left);
+                    printf("%d \n", return_value);
+                    alreadyReturned = 1;
+                    return return_value;
+                }
             } else {
-                int return_value = eval(tree->left);
-                printf("%d \n", return_value);
-                return return_value;
+                fprintf(stderr, "WARNING: return statement ignored, already returned once\n");
+                return 0;
             }
         }
    }
