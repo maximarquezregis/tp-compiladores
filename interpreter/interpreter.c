@@ -88,13 +88,17 @@ static int eval(AST_NODE *tree) {
             // Declaration already recorded in symbol table by parser; do not evaluate identifier
             return 0;
         case OP_RETURN: {
-            if (!tree->left) {
-                // return without expression
-                return 0;
+            if (!tree->left && returnInt) {
+                fprintf(stderr, "ERROR: main returns void when it should return int \n");
+                exit(EXIT_FAILURE);
+            } else if (!returnInt && tree->left) {
+                fprintf(stderr, "ERROR: main returns int when it should return void \n");
+                exit(EXIT_FAILURE);
+            } else if (!tree->left) {
+                int return_value = eval(tree->left);
+                printf("%d \n", return_value);
+                return return_value;
             }
-            int return_value = eval(tree->left);
-            printf("%d \n", return_value);
-            return return_value;
         }
    }
 
