@@ -5,6 +5,8 @@ int returnInt;
 AST_ROOT *head_ast = NULL;
 AST_ROOT *end_ast = NULL;
 
+extern int yylineno;
+
 // function that allocates memory for each new node and initializes its fields by default
 static AST_NODE* alloc_node(void) {
     AST_NODE* node = (AST_NODE*) malloc(sizeof(AST_NODE));
@@ -12,6 +14,7 @@ static AST_NODE* alloc_node(void) {
     node->left = node->right = NULL;
     node->is_leaf = false;
     node->value = NULL;
+    node->line = -1; // default unknown
     return node;
 }
 
@@ -37,6 +40,7 @@ AST_NODE* new_binary_node(OPERATOR opt, AST_NODE* left, AST_NODE* right) {
     node->right = right;
     if (left) left->father = node;
     if (right) right->father = node;
+    node->line = yylineno;
     return node;
 }
 
@@ -47,6 +51,7 @@ AST_NODE* new_unary_node(OPERATOR opt, AST_NODE* left) {
     node->left = left;
 	// for unary nodes we always use the left child
     if (left) left->father = node;
+    node->line = yylineno;
     return node;
 }
 
@@ -55,6 +60,7 @@ AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
     node->arity = UNARY;
     node->is_leaf = true;
     node->leaf_type = type;
+    node->line = yylineno;
 
     switch (type) {
         case TYPE_INT: {
@@ -75,7 +81,7 @@ AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
 			// finds the memory direction of the node in the symbols' table that contains id
 			ID_TABLE* aux = find((char*) v);
 			if (aux == NULL) {
-				fprintf(stderr, "ERROR: variable '%s' not declared\n", (char*) v);
+				fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, (char*) v);
         		exit(EXIT_FAILURE);
 			} else {
 				node->value = malloc(sizeof(union LEAF));

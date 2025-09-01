@@ -5,6 +5,7 @@
 #include "id_table.h"
 int yylex(void);
 void yyerror(const char *s);
+extern int yylineno;
 %}
 
 %union {
@@ -88,5 +89,5 @@ expr
 %%
 
 void yyerror(const char *s){
-    fprintf(stderr,"-> Syntax ERROR: %s\n", s);
+    fprintf(stderr,"Syntax ERROR(line %d): %s\n", yylineno, s);
 }

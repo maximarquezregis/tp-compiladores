@@ -5,6 +5,8 @@
 #include <errno.h>
 #include <string.h>
 
+extern int yylineno;
+
 ID_TABLE* head_table = NULL;
 ID_TABLE* end_table = NULL;
 
@@ -12,7 +14,7 @@ ID_TABLE* end_table = NULL;
 ID_TABLE* add_id(char* name, ID_TYPE type) {
 	// Check for redeclaration BEFORE adding to table
 	if(find(name) != NULL) {
-		fprintf(stderr, "ERROR: variable '%s' redeclared\n", name);
+		fprintf(stderr, "ERROR(line %d): variable '%s' redeclared\n", yylineno, name);
         exit(EXIT_FAILURE);
 	}
 
@@ -33,11 +35,11 @@ ID_TABLE* add_id(char* name, ID_TYPE type) {
 void add_data(char* name, ID_TYPE type, void* data) {
 	ID_TABLE* aux = find(name);
 	if (aux == NULL) {
-		fprintf(stderr, "ERROR: variable '%s' not declared\n", name);
+		fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, name);
         exit(EXIT_FAILURE);
 	}
 	if (aux->id_type != type) {
-		fprintf(stderr, "ERROR: type mismatch in assignment to variable '%s'\n", name);
+		fprintf(stderr, "ERROR(line %d): type mismatch in assignment to variable '%s'\n", yylineno, name);
 		exit(EXIT_FAILURE);
 	}
 
@@ -57,7 +59,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
             memcpy(aux->data, data, sizeof(int));
             return;
         case UNKNOWN:
-            fprintf(stderr, "ERROR: variable '%s' not declared\n", name);
+            fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, name);
         	exit(EXIT_FAILURE);
     }
 
