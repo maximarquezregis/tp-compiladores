@@ -94,7 +94,7 @@ static int eval(AST_NODE *tree) {
             } else if (!returnInt && tree->left) {
                 fprintf(stderr, "ERROR: main returns int when it should return void \n");
                 exit(EXIT_FAILURE);
-            } else if (!tree->left) {
+            } else {
                 int return_value = eval(tree->left);
                 printf("%d \n", return_value);
                 return return_value;
