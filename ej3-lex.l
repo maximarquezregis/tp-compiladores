@@ -49,7 +49,9 @@ int main(int argc,char *argv[]){
     print_program_horizontal();
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
        interpreter(cur->sentence);
+       genCode(cur->sentence);
     }
+    printCodeToFile("assembly/genAssembly.txt");
     print_id_table();
     return 0;
 }
