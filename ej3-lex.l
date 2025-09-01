@@ -12,6 +12,7 @@
 int yyparse(void);
 void yyerror(const char *s);
 char *strdup(const char *s);
+extern int yylineno;
 %}
 
 %option noyywrap
@@ -37,7 +38,7 @@ digito [0-9]+
 [+\-*/%=]              { return *yytext; }
 [;(){}]                { return *yytext; }
 [ \t\r\n]+             { }
-.                      { }
+.                      { fprintf(stderr, "Lexical ERROR(line %d): unknown character '%s'\n", yylineno, yytext); exit(EXIT_FAILURE); }
 
 %%
 
@@ -55,7 +56,7 @@ int main(int argc,char *argv[]){
             break;
        }
     }
-    printCodeToFile("assembly/genAssembly.txt");
+    printCodeToFile("assembly/gen_assembly.txt");
     print_id_table();
     return 0;
 }

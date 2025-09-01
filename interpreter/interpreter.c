@@ -10,9 +10,10 @@ int alreadyReturned = 0;
  */
 static int eval(AST_NODE *tree) {
     if (!tree) {
-        fprintf(stderr, "ERROR: NULL node in eval()\n");
+        fprintf(stderr, "ERROR(line %d): NULL node in eval()\n", -1);
         exit(EXIT_FAILURE);
     }
+    int line = tree->line;
 
     if (tree->is_leaf) {
         switch (tree->leaf_type) {
@@ -23,17 +24,17 @@ static int eval(AST_NODE *tree) {
             case TYPE_ID: {
                 ID_TABLE *id = tree->value->id_leaf;
                 if (!id) {
-                    fprintf(stderr, "ERROR: nonexistent identifier (NULL)\n");
+                    fprintf(stderr, "ERROR(line %d): nonexistent identifier (NULL)\n", line);
                     exit(EXIT_FAILURE);
                 }
                 if (id->data == NULL) {
-                    fprintf(stderr, "ERROR: variable '%s' used before initialization\n", id->id_name);
+                    fprintf(stderr, "ERROR(line %d): variable '%s' used before initialization\n", line, id->id_name);
                     exit(EXIT_FAILURE);
                 }
                 return *(int*)id->data;
             }
         }
-        fprintf(stderr, "ERROR: unknown leaf type\n");
+        fprintf(stderr, "ERROR(line %d): unknown leaf type\n", line);
         exit(EXIT_FAILURE);
     }
 
@@ -47,7 +48,7 @@ static int eval(AST_NODE *tree) {
         case OP_DIVISION: {
             int denom = eval(tree->right);
             if (denom == 0) {
-                fprintf(stderr, "ERROR: division by zero\n");
+                fprintf(stderr, "ERROR(line %d): division by zero\n", line);
                 exit(EXIT_FAILURE);
             }
             return eval(tree->left) / denom;
@@ -63,7 +64,7 @@ static int eval(AST_NODE *tree) {
         case OP_ASSIGN: {
             // Left must be a TYPE_ID leaf
             if (!tree->left || !tree->left->is_leaf || tree->left->leaf_type != TYPE_ID) {
-                fprintf(stderr, "ERROR: invalid left-hand side of assignment\n");
+                fprintf(stderr, "ERROR(line %d): invalid left-hand side of assignment\n", line);
                 exit(EXIT_FAILURE);
             }
             ID_TABLE *id = tree->left->value->id_leaf;
@@ -80,7 +81,7 @@ static int eval(AST_NODE *tree) {
                     break;
                 }
                 case UNKNOWN:
-                    fprintf(stderr, "ERROR: assignment to unknown identifier '%s'\n", id->id_name);
+                    fprintf(stderr, "ERROR(line %d): assignment to unknown identifier '%s'\n", line, id->id_name);
                     exit(EXIT_FAILURE);
             }
             return value;
@@ -92,10 +93,10 @@ static int eval(AST_NODE *tree) {
         case OP_RETURN: {
             if (!alreadyReturned) {
                 if (!tree->left && returnInt) {
-                    fprintf(stderr, "ERROR: main returns void when it should return int \n");
+                    fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
                     exit(EXIT_FAILURE);
                 } else if (!returnInt && tree->left) {
-                    fprintf(stderr, "ERROR: main returns int when it should return void \n");
+                    fprintf(stderr, "ERROR(line %d): main returns int when it should return void\n", line);
                     exit(EXIT_FAILURE);
                 } else {
                     int return_value = eval(tree->left);
@@ -104,13 +105,13 @@ static int eval(AST_NODE *tree) {
                     return return_value;
                 }
             } else {
-                fprintf(stderr, "WARNING: return statement ignored, already returned once\n");
+                fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
                 return 0;
             }
         }
-   }
+    }
 
-    fprintf(stderr, "ERROR: unknown operator in interpreter\n");
+    fprintf(stderr, "ERROR(line %d): unknown operator in interpreter\n", line);
     exit(EXIT_FAILURE);
 }
 

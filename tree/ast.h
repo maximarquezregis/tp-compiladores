@@ -76,6 +76,8 @@ struct AST_NODE {
     // this fields will remain NULL if is_leaf is false
     LEAF_TYPE leaf_type;
     union LEAF *value;
+    // source line where node was created
+    int line;
 };
 
 struct AST_ROOT {
