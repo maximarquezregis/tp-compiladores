@@ -35,6 +35,7 @@ extern int yylineno;
 program
     : INT M  { returnInt = true; }
     | VOID M { returnInt = false; }
+    | BOOL M { returnBool = true; }
     ;
 
 M

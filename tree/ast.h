@@ -19,6 +19,7 @@ typedef struct BOOL_LEAF BOOL_LEAF;
 // flag used for checking if the program should return an integer or void
 // assuming there's no other types main can return
 extern int returnInt;
+extern int returnBool;
 extern AST_ROOT *head_ast;
 extern AST_ROOT *end_ast;
 

@@ -2,6 +2,7 @@
 #include <stdbool.h>
 
 int returnInt;
+int returnBool;
 AST_ROOT *head_ast = NULL;
 AST_ROOT *end_ast = NULL;
 
