@@ -122,7 +122,7 @@ void print_program_vertical(void) {
         print_tree_ascii(cur->sentence, 0, 0);
         cur = cur->next;
     }
-    printf("\n========================\n");
+    printf("\n========================\n\n");
 }
 
 
@@ -136,7 +136,7 @@ static const char *id_type_to_string(ID_TYPE t) {
 }
 
 void print_id_table(void) {
-    printf("=== Symbol Table (ID_TABLE) ===\n");
+    printf("\n=== Symbol Table (ID_TABLE) ===\n");
     if (!head_table) {
         printf("(empty)\n");
         printf("================================\n");

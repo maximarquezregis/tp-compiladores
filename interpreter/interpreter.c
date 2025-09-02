@@ -10,14 +10,15 @@ int alreadyReturned = 0;
  * Performs type checking on every operation and variable.
  */
 static void eval(AST_NODE *tree, ReturnValueNode *ret) {
+    int line = tree->line;
     if (alreadyReturned){
+        fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
         return;
     }
     if (!tree) {
         fprintf(stderr, "ERROR(line %d): NULL node in eval()\n", -1);
         exit(EXIT_FAILURE);
     }
-    int line = tree->line;
     if (tree->is_leaf) {
         switch (tree->leaf_type) {
             case TYPE_INT:
