@@ -10,6 +10,9 @@ int alreadyReturned = 0;
  * Performs type checking on every operation and variable.
  */
 static void eval(AST_NODE *tree, ReturnValueNode *ret) {
+    if (alreadyReturned){
+        return;
+    }
     if (!tree) {
         fprintf(stderr, "ERROR(line %d): NULL node in eval()\n", -1);
         exit(EXIT_FAILURE);
@@ -234,11 +237,10 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                 }
             } else {
                 fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
-                return;
+                break;
             }
         }
     }
-
     fprintf(stderr, "ERROR(line %d): unknown operator in interpreter\n", line);
     exit(EXIT_FAILURE);
 }
