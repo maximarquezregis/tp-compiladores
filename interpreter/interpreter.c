@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "interpreter.h"
+#include "error_handling.h"
 
 int alreadyReturned = 0;
 
@@ -12,12 +13,10 @@ int alreadyReturned = 0;
 static void eval(AST_NODE *tree, ReturnValueNode *ret) {
     int line = tree->line;
     if (alreadyReturned){
-        fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
-        return;
+        warning_already_returned(line);
     }
     if (!tree) {
-        fprintf(stderr, "ERROR(line %d): NULL node in eval()\n", -1);
-        exit(EXIT_FAILURE);
+        null_node(-1);
     }
     if (tree->is_leaf) {
         switch (tree->leaf_type) {
@@ -34,28 +33,24 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             case TYPE_ID: {
                 ID_TABLE *id = tree->value->id_leaf;
                 if (!id) {
-                    fprintf(stderr, "ERROR(line %d): nonexistent identifier (NULL)\n", line);
-                    exit(EXIT_FAILURE);
+                    noexistent_id(line);
                 }
                 if (id->data == NULL) {
-                    fprintf(stderr, "ERROR(line %d): variable '%s' used before initialization\n", line, id->id_name);
-                    exit(EXIT_FAILURE);
+                    variable_used_before_init(line, id->id_name);
                 }
                 if (id->id_type == CONST_INT) {
                     ret->type = INT_TYPE;
                 } else if (id->id_type == CONST_BOOL) {
                     ret->type = BOOL_TYPE;
                 } else {
-                    fprintf(stderr, "ERROR: identifier '%s' has unknown type\n", id->id_name);
-                    exit(EXIT_FAILURE);
+                    id_unknown_type(line, id->id_name);
                 }
                 ret->value = malloc(sizeof(int));
                 *(int*)ret->value = *(int*)id->data;
                 return;
             }
         }
-        fprintf(stderr, "ERROR(line %d): unknown leaf type\n", line);
-        exit(EXIT_FAILURE);
+        unknown_leaf_type(line);
     }
     ReturnValueNode left;
     ReturnValueNode right;
@@ -64,7 +59,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR: addition is only for integers\n");
+                fprintf(stderr, "ERROR(line %d): addition is only for integers\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = INT_TYPE;
@@ -77,7 +72,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR: substraction is only for integers\n");
+                fprintf(stderr, "ERROR(line %d): substraction is only for integers\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = INT_TYPE;
@@ -90,7 +85,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR: multiplication is only for integers\n");
+                fprintf(stderr, "ERROR(line %d): multiplication is only for integers\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = INT_TYPE;
@@ -103,7 +98,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR: divison is only for integers\n");
+                fprintf(stderr, "ERROR(line %d): divison is only for integers\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = INT_TYPE;
@@ -121,7 +116,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_MINUS:
             eval(tree->left, &left);
             if (left.type != INT_TYPE) {
-                fprintf(stderr, "ERROR: minus is only for integers\n");
+                fprintf(stderr, "ERROR(line %d): minus is only for integers\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = INT_TYPE;
@@ -133,7 +128,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != BOOL_TYPE || right.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR: AND is only for booleans \n");
+                fprintf(stderr, "ERROR(line %d): AND is only for booleans \n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = BOOL_TYPE;
@@ -146,7 +141,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != BOOL_TYPE || right.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR: OR is only for booleans \n");
+                fprintf(stderr, "ERROR(line %d): OR is only for booleans \n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = BOOL_TYPE;
@@ -158,7 +153,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_NEG:
             eval(tree->left, &left);
             if (left.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR: NEG is only for booleans \n");
+                fprintf(stderr, "ERROR(line %d): NEG is only for booleans \n", line);
                 exit(EXIT_FAILURE);
             }
             ret->type = BOOL_TYPE;
@@ -178,7 +173,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
 
             if ((id->id_type == CONST_INT && right.type != INT_TYPE) ||
                 (id->id_type == CONST_BOOL && right.type != BOOL_TYPE)) {
-                fprintf(stderr, "ERROR: type mismatch in assignment to variable '%s'\n", id->id_name);
+                fprintf(stderr, "ERROR(line %d): type mismatch in assignment to variable '%s'\n", line, id->id_name);
                 exit(EXIT_FAILURE);
             }
 
