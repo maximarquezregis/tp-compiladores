@@ -210,35 +210,30 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             ret->type = (tree->op == OP_DECL_INT) ? INT_TYPE : BOOL_TYPE;
             return;
         case OP_RETURN: {
-            if (!alreadyReturned) {
-                if (!tree->left && returnInt) {
-                    fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
+            if (!tree->left && returnInt) {
+                fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
+                exit(EXIT_FAILURE);
+            } else if (!returnInt && tree->left) {
+                fprintf(stderr, "ERROR(line %d): main returns int when it should return void\n", line);
+                exit(EXIT_FAILURE);
+            } else if (tree->left) {
+                eval(tree->left, &left);
+                if (returnInt && left.type != INT_TYPE) {
+                    fprintf(stderr, "ERROR(line %d): main should return int\n", line);
                     exit(EXIT_FAILURE);
-                } else if (!returnInt && tree->left) {
-                    fprintf(stderr, "ERROR(line %d): main returns int when it should return void\n", line);
-                    exit(EXIT_FAILURE);
-                } else if (tree->left) {
-                    eval(tree->left, &left);
-                    if (returnInt && left.type != INT_TYPE) {
-                        fprintf(stderr, "ERROR(line %d): main should return int\n", line);
-                        exit(EXIT_FAILURE);
-                    }
-                    ret->type = left.type;
-                    ret->value = malloc(sizeof(int));
-                    *(int*)ret->value = (*(int*)left.value);
-                    int return_value = *(int*)ret->value;
-                    alreadyReturned = 1;
-                    free(left.value);
-                    return;
-                } else {
-                    if (!returnInt) {
-                        alreadyReturned = 1;
-                        return;
-                    }
                 }
+                ret->type = left.type;
+                ret->value = malloc(sizeof(int));
+                *(int*)ret->value = (*(int*)left.value);
+                int return_value = *(int*)ret->value;
+                alreadyReturned = 1;
+                free(left.value);
+                return;
             } else {
-                fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
-                break;
+                if (!returnInt) {
+                    alreadyReturned = 1;
+                    return;
+                }
             }
         }
     }

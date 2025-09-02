@@ -59,3 +59,4 @@ dkms.conf
 *.yy.c
 
 parser
+gen_assembly.txt

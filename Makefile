@@ -2,7 +2,7 @@
 LEX     = flex
 BISON   = bison
 CC      = gcc
-CFLAGS  = -g -Wall -Wextra -std=c11 -I. -Itree -Isymbol_table -Iprint_utilities -Iinterpreter -Iassembly
+CFLAGS  = -g -Wall -Wextra -std=c11 -I. -Itree -Isymbol_table -Iprint_utilities -Iinterpreter -Iassembly -Ierror_handling
 TARGET  = parser
 
 # Sources
@@ -12,7 +12,7 @@ GEN_Y_TAB_H   = ej3-sint.tab.h
 LEX_FILE      = ej3-lex.l
 YACC_FILE     = ej3-sint.y
 
-SRCS = tree/ast.c symbol_table/id_table.c print_utilities/print_funcs.c interpreter/interpreter.c assembly/pas.c
+SRCS = tree/ast.c symbol_table/id_table.c print_utilities/print_funcs.c interpreter/interpreter.c assembly/pas.c error_handling/error_handling.c
 OBJS = $(SRCS:.c=.o) $(GEN_LEX_SRC:.c=.o) $(GEN_Y_TAB_C:.c=.o)
 
 .PHONY: all clean
@@ -50,6 +50,10 @@ interpreter/%.o: interpreter/%.c
 assembly/%.o: assembly/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+error_handling/%.o: error_handling/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+
 clean:
 	rm -f $(OBJS) $(TARGET) $(GEN_LEX_SRC) $(GEN_Y_TAB_C) $(GEN_Y_TAB_H)
-	rm -f tree/*.o symbol_table/*.o print_utilities/*.o interpreter/*.o assembly/*.o
+	rm -f tree/*.o symbol_table/*.o print_utilities/*.o interpreter/*.o assembly/*.o error_handling/*.o

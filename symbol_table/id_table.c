@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include "error_handling.h"
 
 extern int yylineno;
 
@@ -14,8 +15,7 @@ ID_TABLE* end_table = NULL;
 ID_TABLE* add_id(char* name, ID_TYPE type) {
 	// Check for redeclaration BEFORE adding to table
 	if(find(name) != NULL) {
-		fprintf(stderr, "ERROR(line %d): variable '%s' redeclared\n", yylineno, name);
-        exit(EXIT_FAILURE);
+		redeclaration_variable(yylineno, name);
 	}
 
 	ID_TABLE* aux = allocate_mem();
@@ -35,12 +35,10 @@ ID_TABLE* add_id(char* name, ID_TYPE type) {
 void add_data(char* name, ID_TYPE type, void* data) {
 	ID_TABLE* aux = find(name);
 	if (aux == NULL) {
-		fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, name);
-        exit(EXIT_FAILURE);
+		variable_not_declared(yylineno, name);
 	}
 	if (aux->id_type != type) {
-		fprintf(stderr, "ERROR(line %d): type mismatch in assignment to variable '%s'\n", yylineno, name);
-		exit(EXIT_FAILURE);
+		type_mismatch(yylineno, name);
 	}
 
 	// Only free if data was previously allocated
@@ -59,8 +57,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
             memcpy(aux->data, data, sizeof(int));
             return;
         case UNKNOWN:
-            fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, name);
-        	exit(EXIT_FAILURE);
+            variable_not_declared(yylineno, name);
     }
 
 	return;
@@ -81,8 +78,7 @@ ID_TABLE* find(char* name) {
 ID_TABLE* allocate_mem() {
 	ID_TABLE* aux = malloc(sizeof(ID_TABLE));
 	if (!aux) {
-        perror("allocate_mem() error");
-        exit(EXIT_FAILURE);
+        allocate_mem_error();
     }
 
 	// initializes all data to NULL
