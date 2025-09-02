@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "interpreter.h"
 
+int alreadyReturned = 0;
+
 /*
  * Recursively evaluates an AST node and stores its type and value in ‘ret’.
  * Booleans are represented as 0 (false) or 1 (true).
@@ -9,9 +11,10 @@
  */
 static void eval(AST_NODE *tree, ReturnValueNode *ret) {
     if (!tree) {
-        fprintf(stderr, "ERROR: NULL node in eval()\n");
+        fprintf(stderr, "ERROR(line %d): NULL node in eval()\n", -1);
         exit(EXIT_FAILURE);
     }
+    int line = tree->line;
     if (tree->is_leaf) {
         switch (tree->leaf_type) {
             case TYPE_INT:
@@ -27,11 +30,11 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             case TYPE_ID: {
                 ID_TABLE *id = tree->value->id_leaf;
                 if (!id) {
-                    fprintf(stderr, "ERROR: nonexistent identifier (NULL)\n");
+                    fprintf(stderr, "ERROR(line %d): nonexistent identifier (NULL)\n", line);
                     exit(EXIT_FAILURE);
                 }
                 if (id->data == NULL) {
-                    fprintf(stderr, "ERROR: variable '%s' used before initialization\n", id->id_name);
+                    fprintf(stderr, "ERROR(line %d): variable '%s' used before initialization\n", line, id->id_name);
                     exit(EXIT_FAILURE);
                 }
                 if (id->id_type == CONST_INT) {
@@ -47,7 +50,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                 return;
             }
         }
-        fprintf(stderr, "ERROR: unknown leaf type\n");
+        fprintf(stderr, "ERROR(line %d): unknown leaf type\n", line);
         exit(EXIT_FAILURE);
     }
     ReturnValueNode left;
@@ -102,7 +105,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             ret->type = INT_TYPE;
             int denom = (*(int*)right.value);
             if (denom == 0) {
-                fprintf(stderr, "ERROR: division by zero\n");
+                fprintf(stderr, "ERROR(line %d): division by zero\n", line);
                 exit(EXIT_FAILURE);
             }
             ret->value = malloc(sizeof(int));
@@ -162,7 +165,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_ASSIGN: {
             // Left must be a TYPE_ID leaf
             if (!tree->left || !tree->left->is_leaf || tree->left->leaf_type != TYPE_ID) {
-                fprintf(stderr, "ERROR: invalid left-hand side of assignment\n");
+                fprintf(stderr, "ERROR(line %d): invalid left-hand side of assignment\n", line);
                 exit(EXIT_FAILURE);
             }
             ID_TABLE *id = tree->left->value->id_leaf;
@@ -189,7 +192,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                     break;
                 }
                 case UNKNOWN:
-                    fprintf(stderr, "ERROR: assignment to unknown identifier '%s'\n", id->id_name);
+                    fprintf(stderr, "ERROR(line %d): assignment to unknown identifier '%s'\n", line, id->id_name);
                     exit(EXIT_FAILURE);
             }
             free(right.value);
@@ -203,22 +206,40 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             ret->type = (tree->op == OP_DECL_INT) ? INT_TYPE : BOOL_TYPE;
             return;
         case OP_RETURN: {
-            if (!tree->left) {
-                // return without expression
+            if (!alreadyReturned) {
+                if (!tree->left && returnInt) {
+                    fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
+                    exit(EXIT_FAILURE);
+                } else if (!returnInt && tree->left) {
+                    fprintf(stderr, "ERROR(line %d): main returns int when it should return void\n", line);
+                    exit(EXIT_FAILURE);
+                } else if (tree->left) {
+                    eval(tree->left, &left);
+                    if (returnInt && left.type != INT_TYPE) {
+                        fprintf(stderr, "ERROR(line %d): main should return int\n", line);
+                        exit(EXIT_FAILURE);
+                    }
+                    ret->type = left.type;
+                    ret->value = malloc(sizeof(int));
+                    *(int*)ret->value = (*(int*)left.value);
+                    int return_value = *(int*)ret->value;
+                    alreadyReturned = 1;
+                    free(left.value);
+                    return;
+                } else {
+                    if (!returnInt) {
+                        alreadyReturned = 1;
+                        return;
+                    }
+                }
+            } else {
+                fprintf(stderr, "WARNING(line %d): return statement ignored, already returned once\n", line);
                 return;
             }
-            eval(tree->left, &left);
-            ret->type = left.type;
-            ret->value = malloc(sizeof(int));
-            *(int*)ret->value = (*(int*)left.value);
-            int return_value = *(int*)ret->value;
-            printf("%d \n", return_value);
-            free(left.value);
-            return;
         }
-   }
+    }
 
-    fprintf(stderr, "ERROR: unknown operator in interpreter\n");
+    fprintf(stderr, "ERROR(line %d): unknown operator in interpreter\n", line);
     exit(EXIT_FAILURE);
 }
 

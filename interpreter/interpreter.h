@@ -14,6 +14,8 @@ typedef struct {
     TYPE type;
 } ReturnValueNode;
 
+extern int alreadyReturned;
+
 int interpreter(AST_NODE* tree);
 
 #endif

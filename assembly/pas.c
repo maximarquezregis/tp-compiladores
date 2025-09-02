@@ -109,8 +109,11 @@ void printCodeToFile(const char* filename) {
             case I_LOAD:
                 fprintf(f, "LOAD %s\n", code[i].arg);
                 break;
+            case I_DECL:
+                fprintf(f, "DECL %s\n", code[i].arg);
+                break;
             case I_STORE:
-                fprintf(f, "STORE %s\n", code[i].arg);
+                fprintf(f, "STORE %s, EAX\n", code[i].arg);
                 break;
             case I_ADD:
                 fprintf(f, "ADD\n");
