@@ -143,3 +143,8 @@ void syntax_error(int line, char* msg){
     fprintf(stderr,"Syntax ERROR(line %d): %s\n", line, msg);
     exit(EXIT_FAILURE);
 }
+
+void error_missing_return(int line){
+    fprintf(stderr, "ERROR(line %d): missing return statement in main\n", line);
+    exit(EXIT_FAILURE);
+}

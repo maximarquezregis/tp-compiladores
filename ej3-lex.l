@@ -50,7 +50,11 @@ int main(int argc,char *argv[]){
     yyparse();
     print_program_horizontal();
     extern int alreadyReturned;
-    printf("Returned value: %d\n", interpreter(head_ast));
+    if (returnInt || returnBool) {
+        printf("Returned value: %d\n", interpreter(head_ast));
+    } else {
+        interpreter(head_ast);
+    }
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
        genCode(cur->sentence);
     }

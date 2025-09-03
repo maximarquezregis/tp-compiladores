@@ -244,5 +244,8 @@ int interpreter(AST_ROOT *tree) {
     for (AST_ROOT* cur = tree; cur != NULL; cur = cur->next) {
         eval(cur->sentence, &ret);
     }
+    if (alreadyReturned == 0 && (returnInt || returnBool)) {
+        error_missing_return(-1);
+    }
     return *(int*)ret.value;
 }

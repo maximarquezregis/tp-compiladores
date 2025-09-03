@@ -28,5 +28,6 @@ void error_unespected_return(int line, char* type);
 void error_unknown_operator(int line);
 void lexical_error(int line, char* msg);
 void syntax_error(int line, char* msg);
+void error_missing_return(int line);
 
 #endif 
