@@ -52,9 +52,6 @@ int main(int argc,char *argv[]){
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
        interpreter(cur->sentence);
        genCode(cur->sentence);
-       if (alreadyReturned) {
-            break;
-       }
     }
     printCodeToFile("assembly/gen_assembly.txt");
     print_id_table();

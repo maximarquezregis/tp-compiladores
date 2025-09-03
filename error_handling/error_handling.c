@@ -141,4 +141,5 @@ void lexical_error(int line, char* msg){
 
 void syntax_error(int line, char* msg){
     fprintf(stderr,"Syntax ERROR(line %d): %s\n", line, msg);
+    exit(EXIT_FAILURE);
 }

@@ -14,6 +14,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
     int line = tree->line;
     if (alreadyReturned){
         warning_already_returned(line);
+        return;
     }
     if (!tree) {
         error_null_node(-1);
