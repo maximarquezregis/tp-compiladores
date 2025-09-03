@@ -104,3 +104,41 @@ void assign_error(int line){
     fprintf(stderr, "ERROR(line %d): invalid left-hand side of assignment\n", line);
     exit(EXIT_FAILURE);
 }
+
+void error_return_int(int line){
+    fprintf(stderr, "ERROR(line %d): main should return int\n", line);
+    exit(EXIT_FAILURE);
+}
+
+void error_return_bool(int line){
+    fprintf(stderr, "ERROR(line %d): main should return bool\n", line);
+    exit(EXIT_FAILURE);
+}
+
+void error_return_void(int line){
+    fprintf(stderr, "ERROR(line %d): main should return void\n", line);
+    exit(EXIT_FAILURE);
+}
+
+void error_unespected_return(int line, char* type){
+    if (type == "int"){
+        fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
+    } else {
+        fprintf(stderr, "ERROR(line %d): main returns void when it should return bool\n", line);
+    }
+    exit(EXIT_FAILURE);   
+}
+
+void error_unknown_operator(int line){
+    fprintf(stderr, "ERROR(line %d): unknown operator in interpreter\n", line);
+    exit(EXIT_FAILURE);
+}
+
+void lexical_error(int line, char* msg){
+    fprintf(stderr, "Lexical ERROR(line %d): unknown character '%s'\n", line, msg);
+    exit(EXIT_FAILURE);
+}
+
+void syntax_error(int line, char* msg){
+    fprintf(stderr,"Syntax ERROR(line %d): %s\n", line, msg);
+}

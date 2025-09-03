@@ -38,7 +38,7 @@ digito [0-9]+
 [+\-*/%=]              { return *yytext; }
 [;(){}]                { return *yytext; }
 [ \t\r\n]+             { }
-.                      { fprintf(stderr, "Lexical ERROR(line %d): unknown character '%s'\n", yylineno, yytext); exit(EXIT_FAILURE); }
+.                      { lexical_error(yylineno, yytext); }
 
 %%
 

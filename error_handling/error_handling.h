@@ -21,5 +21,12 @@ void and_error(int line);
 void or_error(int line);
 void neg_error(int line);
 void assign_error(int line);
+void error_return_int(int line);
+void error_return_bool(int line);
+void error_return_void(int line);
+void error_unespected_return(int line, char* type);
+void error_unknown_operator(int line);
+void lexical_error(int line, char* msg);
+void syntax_error(int line, char* msg);
 
 #endif 

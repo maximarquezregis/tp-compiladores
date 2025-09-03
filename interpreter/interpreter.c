@@ -163,8 +163,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
 
             if ((id->id_type == CONST_INT && right.type != INT_TYPE) ||
                 (id->id_type == CONST_BOOL && right.type != BOOL_TYPE)) {
-                fprintf(stderr, "ERROR(line %d): type mismatch in assignment to variable '%s'\n", line, id->id_name);
-                exit(EXIT_FAILURE);
+                error_type_mismatch(line, id->id_name);
             }
 
             ret->type = right.type;
@@ -181,8 +180,8 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                     break;
                 }
                 case UNKNOWN:
-                    fprintf(stderr, "ERROR(line %d): assignment to unknown identifier '%s'\n", line, id->id_name);
-                    exit(EXIT_FAILURE);
+                    error_id_unknown_type(line, id->id_name);
+                    break;
             }
             free(right.value);
             return;
@@ -199,8 +198,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                 if (returnInt) {
                     eval(tree->left, &left);
                     if (returnInt && left.type != INT_TYPE) {
-                        fprintf(stderr, "ERROR(line %d): main should return int\n", line);
-                        exit(EXIT_FAILURE);
+                        error_return_int(line);
                     }
                     ret->type = left.type;
                     ret->value = malloc(sizeof(int));
@@ -212,8 +210,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                 } else if (returnBool) {
                     eval(tree->left, &left);
                     if (left.type != BOOL_TYPE) {
-                        fprintf(stderr, "ERROR(line %d): main should return bool\n", line);
-                        exit(EXIT_FAILURE);
+                        error_return_bool(line);
                     }
                     ret->type = left.type;
                     ret->value = malloc(sizeof(int));
@@ -223,16 +220,13 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                     free(left.value);
                     return;
                 } else {
-                    fprintf(stderr, "ERROR(line %d): main should return void\n", line);
-                    exit(EXIT_FAILURE);
+                    error_return_void(line);
                 }
             } else {
                 if (returnInt) {
-                    fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
-                    exit(EXIT_FAILURE);
+                    error_unespected_return(line, "int");
                 } else if (returnBool) {
-                    fprintf(stderr, "ERROR(line %d): main returns void when it should return bool\n", line);
-                    exit(EXIT_FAILURE);
+                    error_unespected_return(line, "bool");
                 } else {
                     alreadyReturned = 1;
                     return;
@@ -240,8 +234,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             }
         }
     }
-    fprintf(stderr, "ERROR(line %d): unknown operator in interpreter\n", line);
-    exit(EXIT_FAILURE);
+    error_unknown_operator(line);
 }
 
 /* Public function: interprets (evaluates) a tree */

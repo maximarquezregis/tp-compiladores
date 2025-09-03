@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "ast.h"
 #include "id_table.h"
+#include "error_handling.h"
 int yylex(void);
 void yyerror(const char *s);
 extern int yylineno;
@@ -90,5 +91,5 @@ expr
 %%
 
 void yyerror(const char *s){
-    fprintf(stderr,"Syntax ERROR(line %d): %s\n", yylineno, s);
+    syntax_error(yylineno, (char*) s);    
 }

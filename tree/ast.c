@@ -1,5 +1,6 @@
 #include "ast.h"
 #include <stdbool.h>
+#include "error_handling.h"
 
 int returnInt;
 int returnBool;
@@ -82,8 +83,7 @@ AST_NODE* new_leaf_node(LEAF_TYPE type, void* v) {
 			// finds the memory direction of the node in the symbols' table that contains id
 			ID_TABLE* aux = find((char*) v);
 			if (aux == NULL) {
-				fprintf(stderr, "ERROR(line %d): variable '%s' not declared\n", yylineno, (char*) v);
-        		exit(EXIT_FAILURE);
+				error_variable_not_declared(yylineno, (char*) v);
 			} else {
 				node->value = malloc(sizeof(union LEAF));
                 node->value->id_leaf = aux;
