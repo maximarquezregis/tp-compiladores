@@ -239,8 +239,10 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
 }
 
 /* Public function: interprets (evaluates) a tree */
-int interpreter(AST_NODE *tree) {
+int interpreter(AST_ROOT *tree) {
     ReturnValueNode ret;
-    eval(tree, &ret);
+    for (AST_ROOT* cur = tree; cur != NULL; cur = cur->next) {
+        eval(cur->sentence, &ret);
+    }
     return *(int*)ret.value;
 }

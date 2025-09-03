@@ -9,6 +9,7 @@
 #include "print_funcs.h"
 #include "interpreter.h"
 #include "ej3-sint.tab.h"
+#include "error_handling.h"
 int yyparse(void);
 void yyerror(const char *s);
 char *strdup(const char *s);
@@ -49,8 +50,8 @@ int main(int argc,char *argv[]){
     yyparse();
     print_program_horizontal();
     extern int alreadyReturned;
+    printf("Returned value: %d\n", interpreter(head_ast));
     for (AST_ROOT* cur = head_ast; cur != NULL; cur = cur->next) {
-       interpreter(cur->sentence);
        genCode(cur->sentence);
     }
     printCodeToFile("assembly/gen_assembly.txt");

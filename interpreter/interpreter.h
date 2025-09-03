@@ -16,6 +16,6 @@ typedef struct {
 
 extern int alreadyReturned;
 
-int interpreter(AST_NODE* tree);
+int interpreter(AST_ROOT* tree);
 
 #endif
