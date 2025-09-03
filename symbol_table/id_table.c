@@ -15,7 +15,7 @@ ID_TABLE* end_table = NULL;
 ID_TABLE* add_id(char* name, ID_TYPE type) {
 	// Check for redeclaration BEFORE adding to table
 	if(find(name) != NULL) {
-		redeclaration_variable(yylineno, name);
+		error_redeclaration_variable(yylineno, name);
 	}
 
 	ID_TABLE* aux = allocate_mem();
@@ -35,10 +35,10 @@ ID_TABLE* add_id(char* name, ID_TYPE type) {
 void add_data(char* name, ID_TYPE type, void* data) {
 	ID_TABLE* aux = find(name);
 	if (aux == NULL) {
-		variable_not_declared(yylineno, name);
+		error_variable_not_declared(yylineno, name);
 	}
 	if (aux->id_type != type) {
-		type_mismatch(yylineno, name);
+		error_type_mismatch(yylineno, name);
 	}
 
 	// Only free if data was previously allocated
@@ -57,7 +57,7 @@ void add_data(char* name, ID_TYPE type, void* data) {
             memcpy(aux->data, data, sizeof(int));
             return;
         case UNKNOWN:
-            variable_not_declared(yylineno, name);
+            error_variable_not_declared(yylineno, name);
     }
 
 	return;

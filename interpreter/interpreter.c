@@ -16,7 +16,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         warning_already_returned(line);
     }
     if (!tree) {
-        null_node(-1);
+        error_null_node(-1);
     }
     if (tree->is_leaf) {
         switch (tree->leaf_type) {
@@ -33,24 +33,24 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             case TYPE_ID: {
                 ID_TABLE *id = tree->value->id_leaf;
                 if (!id) {
-                    noexistent_id(line);
+                    error_noexistent_id(line);
                 }
                 if (id->data == NULL) {
-                    variable_used_before_init(line, id->id_name);
+                    error_variable_used_before_init(line, id->id_name);
                 }
                 if (id->id_type == CONST_INT) {
                     ret->type = INT_TYPE;
                 } else if (id->id_type == CONST_BOOL) {
                     ret->type = BOOL_TYPE;
                 } else {
-                    id_unknown_type(line, id->id_name);
+                    error_id_unknown_type(line, id->id_name);
                 }
                 ret->value = malloc(sizeof(int));
                 *(int*)ret->value = *(int*)id->data;
                 return;
             }
         }
-        unknown_leaf_type(line);
+        error_unknown_leaf_type(line);
     }
     ReturnValueNode left;
     ReturnValueNode right;
@@ -59,8 +59,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR(line %d): addition is only for integers\n", line);
-                exit(EXIT_FAILURE);
+                additional_error(line);
             }
             ret->type = INT_TYPE;
             ret->value = malloc(sizeof(int));
@@ -72,8 +71,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR(line %d): substraction is only for integers\n", line);
-                exit(EXIT_FAILURE);
+                substraction_error(line);
             }
             ret->type = INT_TYPE;
             ret->value = malloc(sizeof(int));
@@ -85,8 +83,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR(line %d): multiplication is only for integers\n", line);
-                exit(EXIT_FAILURE);
+                multiplication_error(line);
             }
             ret->type = INT_TYPE;
             ret->value = malloc(sizeof(int));
@@ -98,14 +95,12 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != INT_TYPE || right.type != INT_TYPE) {
-                fprintf(stderr, "ERROR(line %d): divison is only for integers\n", line);
-                exit(EXIT_FAILURE);
+                division_error(line);
             }
             ret->type = INT_TYPE;
             int denom = (*(int*)right.value);
             if (denom == 0) {
-                fprintf(stderr, "ERROR(line %d): division by zero\n", line);
-                exit(EXIT_FAILURE);
+                division_zero_error(line);
             }
             ret->value = malloc(sizeof(int));
             *(int*)ret->value = (*(int*)left.value) / (*(int*)right.value);
@@ -116,8 +111,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_MINUS:
             eval(tree->left, &left);
             if (left.type != INT_TYPE) {
-                fprintf(stderr, "ERROR(line %d): minus is only for integers\n", line);
-                exit(EXIT_FAILURE);
+               minus_error(line); 
             }
             ret->type = INT_TYPE;
             ret->value = malloc(sizeof(int));
@@ -128,8 +122,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != BOOL_TYPE || right.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR(line %d): AND is only for booleans \n", line);
-                exit(EXIT_FAILURE);
+                and_error(line);
             }
             ret->type = BOOL_TYPE;
             ret->value = malloc(sizeof(int));
@@ -141,8 +134,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
             eval(tree->left, &left);
             eval(tree->right, &right);
             if (left.type != BOOL_TYPE || right.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR(line %d): OR is only for booleans \n", line);
-                exit(EXIT_FAILURE);
+                or_error(line);
             }
             ret->type = BOOL_TYPE;
             ret->value = malloc(sizeof(int));
@@ -153,8 +145,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_NEG:
             eval(tree->left, &left);
             if (left.type != BOOL_TYPE) {
-                fprintf(stderr, "ERROR(line %d): NEG is only for booleans \n", line);
-                exit(EXIT_FAILURE);
+                neg_error(line);
             }
             ret->type = BOOL_TYPE;
             ret->value = malloc(sizeof(int));
@@ -164,8 +155,7 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
         case OP_ASSIGN: {
             // Left must be a TYPE_ID leaf
             if (!tree->left || !tree->left->is_leaf || tree->left->leaf_type != TYPE_ID) {
-                fprintf(stderr, "ERROR(line %d): invalid left-hand side of assignment\n", line);
-                exit(EXIT_FAILURE);
+                assign_error(line);
             }
             ID_TABLE *id = tree->left->value->id_leaf;
 
