@@ -120,12 +120,13 @@ void error_return_void(int line){
     exit(EXIT_FAILURE);
 }
 
-void error_unespected_return(int line, char* type){
-    if (type == "int"){
-        fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
-    } else {
-        fprintf(stderr, "ERROR(line %d): main returns void when it should return bool\n", line);
-    }
+void error_unespected_return_int(int line){
+    fprintf(stderr, "ERROR(line %d): main returns void when it should return int\n", line);
+    exit(EXIT_FAILURE);   
+}
+
+void error_unespected_return_bool(int line){
+    fprintf(stderr, "ERROR(line %d): main returns void when it should return bool\n", line);
     exit(EXIT_FAILURE);   
 }
 

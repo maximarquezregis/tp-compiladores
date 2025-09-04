@@ -225,9 +225,9 @@ static void eval(AST_NODE *tree, ReturnValueNode *ret) {
                 }
             } else {
                 if (returnInt) {
-                    error_unespected_return(line, "int");
+                    error_unespected_return_int(line);
                 } else if (returnBool) {
-                    error_unespected_return(line, "bool");
+                    error_unespected_return_bool(line);
                 } else {
                     alreadyReturned = 1;
                     return;
